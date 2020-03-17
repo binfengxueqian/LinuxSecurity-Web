@@ -1,0 +1,143 @@
+<!doctype html>
+<html class="x-admin-sm">
+
+<head>
+    <meta charset="UTF-8">
+    <title>LinuxSecurity管理系统</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/static/css/font.css">
+    <link rel="stylesheet" href="/static/lib/layui/css/layui.css">
+    <script src="/static/lib/layui/layui.js" charset="utf-8"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+</head>
+
+<body class="content">
+<table class="layui-hide" id="test" lay-filter="DataBase"></table>
+<script type="text/html" id="toolbarDemo">
+    <div>CHECK数据库</div>
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="updatemany">批量接受</button>
+        <button class="layui-btn layui-btn-sm" lay-event="delmany">批量删除</button>
+        <button class="layui-btn layui-btn-sm" lay-event="reload">刷新</button>
+        <button class="layui-btn layui-btn-sm" lay-event="export">导出</button>
+    </div>
+</script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="update">接受</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<script>
+    layui.use(['table', 'jquery'], function () {
+        var table = layui.table;
+        var $ = layui.jquery;
+        var result;
+
+        function dataUpdate(data, refresh) {
+            $.ajax({
+                url: '/checkdbshow',
+                method: 'post',
+                data: data,
+                success: function (res) {
+                    if (refresh) {
+                        self.location.reload();
+
+                    }
+                }
+            });
+        }
+
+        var DataBase = table.render({
+            elem: '#test'
+            , url: '/checkdbshow'
+            , limit: 30
+            , where:
+                {% autoescape off %}
+                    {{ query }}
+                {% endautoescape %}
+            , toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            , id: 'select'
+            , cols: [[
+                {type: 'checkbox', fixed: 'left'}
+                , {field: 'id', title: 'ID', width: 90}
+                , {field: 'path', width: 150, title: '文件路径', sort: true}
+                , {field: 'stat', minWidth: 400, title: '文件属性'}
+                , {field: 'MD5', width: 150, title: 'MD5值校验', sort: true}
+                , {field: 'ruleType', width: 150, title: '策略规则'}
+                , {field: 'ruleCheck', title: '策略检查项', width: 100}
+                , {field: 'record', title: '标记', width: 25}
+                , {field: 'time', title: '时间', width: 150}
+                , {fixed: 'right', title: '操作', toolbar: '#barDemo', width: 150}
+            ]]
+            , done: function (res, curr, count) {
+                result = res;
+            }
+            , page: true
+
+        });
+
+        table.on('toolbar(DataBase)', function (obj) {
+            var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+            var checkStatus = table.checkStatus(obj.config.id); //idTest 即为基础参数 id 对应的值
+            switch (layEvent) {
+                case 'updatemany':
+                    var ids = '';
+                    for (i = 0; i < checkStatus.data.length; i++) {
+                        ids = ids + checkStatus.data[i].id.toString() + ',';
+                    }
+                    data = {update: ids};
+                    dataUpdate(data, true);
+                    break;
+                case 'delmany':
+                    var ids = '';
+                    for (i = 0; i < checkStatus.data.length; i++) {
+                        ids = ids + checkStatus.data[i].id.toString() + ',';
+                    }
+                    data = {del: ids};
+                    dataUpdate(data, true);
+                    break;
+                case 'reload':
+                    DataBase.reload();
+                    break;
+                case 'export':
+                    var colsintable = DataBase.config.cols[0];
+                    var cols = ['id'];
+                    for (i = 0; i < colsintable.length; i++) {
+                        if (colsintable[i].field) {
+                            cols.push(colsintable[i].field);
+                        }
+                    }
+                    table.exportFile(cols, result.data, 'csv');
+                    break;
+            }
+        });
+        //监听行工具事件
+        table.on('tool(DataBase)', function (obj) {
+            var data = obj.data; //获得当前行数据
+            var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+            switch (layEvent) {
+                case 'update':
+                    data = {update: data.id.toString() + ','};
+                    dataUpdate(data, false);
+                    obj.del();
+                    break;
+                case 'del':
+                    data = {del: data.id.toString() + ','};
+                    dataUpdate(data, false);
+                    obj.del();
+                    break;
+            }
+        });
+    });
+
+
+</script>
+</body>
+
+</html>

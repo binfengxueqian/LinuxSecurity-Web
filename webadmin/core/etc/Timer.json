@@ -1,0 +1,7 @@
+{
+    "enable": "true",
+    "tigger": "interval",
+    "week": "",
+    "selecttime": "02:04:00",
+    "intervaltime": "0:6:0:0"
+}

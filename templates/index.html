@@ -1,0 +1,229 @@
+<!doctype html>
+<html class="x-admin-sm">
+
+<head>
+    <meta charset="UTF-8">
+    <title>LinuxSecurity管理系统</title>
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="/static/css/font.css">
+
+    <link rel="stylesheet" href="/static/css/xadmin.css">
+    <link rel="stylesheet" href="/static/css/theme2.css">
+    <script src="/static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/jquery.cookie.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    <script>
+            // 是否开启刷新记忆tab功能
+            // var is_remember = false;
+            layui.use(['layer','element','jquery'],function(){
+                layer = layui.layer;
+                element = layui.element;
+                $ = layui.jquery;
+                element.on('demo', function(elem){
+                    //console.log(elem)
+                    layer.msg(elem.text());
+                });
+            });
+
+    </script>
+</head>
+
+<body class="index">
+    <!-- 顶部开始 -->
+    <div class="container">
+        <div class="logo">
+            <a href="./index.html"><img src="/static/images/favicon.png" height="40px" width="40px" />LinuxSecurity</a></div>
+        <div class="left_open">
+            <a><i title="展开左侧栏" class="iconfont">&#xe699;</i></a>
+        </div>
+        <ul class="layui-nav left fast-add" lay-filter="">
+            <li class="layui-nav-item">
+                <a href="javascript:;">执行</a>
+                <dl class="layui-nav-child">
+                    <!-- 二级菜单 -->
+                    <dd>
+                        <a id="initdatabase">
+                            <i class="layui-icon layui-icon-refresh"></i>初始化数据库</a></dd>
+                    <dd>
+                        <a id="checkfile">
+                            <i class="layui-icon layui-icon-survey"></i>检查</a></dd>
+                    <dd>
+                        <a onclick="xadmin.add_tab('定时检查','./setTimer',true)">
+                            <i class="layui-icon layui-icon-time"></i>定期检查</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item">
+                <a href="javascript:;">数据查看</a>
+                <dl class="layui-nav-child">
+                    <!-- 二级菜单 -->
+                    <dd>
+                        <a onclick="xadmin.add_tab('Init数据','./initdbshow',true)">
+                            <i class="layui-icon layui-icon-table"></i>原始数据库</a></dd>
+                    <dd>
+                        <a onclick="xadmin.add_tab('Check数据','./checkdbshow',true)">
+                            <i class="layui-icon layui-icon-table"></i>改动数据库</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item">
+                <a onclick="xadmin.add_tab('任务日志','./log.html',true)">
+                    <i class="layui-icon layui-icon-log"></i>查看日志</a>
+            </li>
+        </ul>
+        <ul class="layui-nav right" lay-filter="">
+            <li class="layui-nav-item">
+                <a href="javascript:;">admin</a>
+                <dl class="layui-nav-child">
+                    <!-- 二级菜单 -->
+                    <dd>
+                        <a onclick="xadmin.add_tab('修改密码','admin_changepass.html')">
+                            <i class="layui-icon layui-icon-user"></i>修改密码
+                        </a></dd>
+                    <dd>
+                        <a onclick="xadmin.add_tab('切换帐号','http://www.baidu.com')">
+                            <i class="layui-icon layui-icon-friends"></i>切换帐号
+                        </a></dd>
+                    <dd>
+                        <a id="logout"><i class="layui-icon layui-icon-logout"></i>退出</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item to-index">
+                <a id="toHome"><i class="layui-icon layui-icon-home"></i>前台首页</a></li>
+        </ul>
+    </div>
+    <!-- 顶部结束 -->
+    <!-- 中部开始 -->
+    <!-- 左侧菜单开始 -->
+    <div class="left-nav" lay-filter="demo">
+        <div id="side-nav">
+            <ul id="nav">
+                <li>
+                    <a href="javascript:;">
+                        
+                        <i class="layui-icon layui-icon-set-fill"  lay-tips="项目配置"></i>
+                        <!-- <i class="iconfont left-nav-li" lay-tips="项目配置">&#xe6b8;</i> -->
+                        <cite>项目配置</cite>
+                        </a>
+
+                    <ul class="sub-menu">
+                        <li>
+                            <a onclick="xadmin.add_tab('邮箱配置','email.html')">
+                                <!-- <i class="layui-icon layui-icon-email"></i> -->
+                                <cite>邮箱配置</cite></a>
+                        </li>
+                        <li>
+                            <a onclick="xadmin.add_tab('数据库配置','member-list.html')">
+                                <!-- <i class="layui-icon layui-icon-engine"></i> -->
+                                <cite>数据库配置</cite></a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    
+                    <a onclick="xadmin.add_tab('开发者模式','developer.html',true)">
+                        <i class="layui-icon layui-icon-set-fill"  lay-tips="开发者模式"></i>
+                        <cite>开发者模式</cite></a>
+                </li>
+                <li>
+                    <a href="javascript:;">
+                        <i class="iconfont left-nav-li" lay-tips="子设备管理">&#xe726;</i>
+                        <cite>子设备管理</cite>
+                    </a>
+                    <ul class="sub-menu">
+                        <li>
+                            <a onclick="xadmin.add_tab('添加子设备','BindSubdevice.html')">
+                                <cite>添加子设备</cite></a>
+                        </li>
+                        <li>
+                            <a onclick="xadmin.add_tab('角色管理','admin-role.html')">
+                                <cite>角色管理</cite></a>
+                        </li>
+                        <li>
+                            <a onclick="xadmin.add_tab('权限分类','admin-cate.html')">
+                                <cite>权限分类</cite></a>
+                        </li>
+                        <li>
+                            <a onclick="xadmin.add_tab('权限管理','admin-rule.html')">
+                                <cite>权限管理</cite></a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- <div class="x-slide_left"></div> -->
+    <!-- 左侧菜单结束 -->
+    <!-- 右侧主体开始 -->
+    <div class="page-content">
+        <div class="layui-tab tab" lay-filter="xbs_tab" lay-allowclose="false">
+            <ul class="layui-tab-title">
+                <li class="home" lay-id="home">
+                    <i class="layui-icon">&#xe68e;</i>我的桌面</li>
+            </ul>
+            <div class="layui-unselect layui-form-select layui-form-selected" id="tab_right">
+                <dl>
+                    <dd data-type="this">关闭当前</dd>
+                    <dd data-type="other">关闭其它</dd>
+                    <dd data-type="all">关闭全部</dd>
+                </dl>
+            </div>
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+                    <iframe src='./home.html?action=gethtml' frameborder="0" scrolling="yes" class="x-iframe" id="rightMain"></iframe>
+                </div>
+            </div>
+            <div id="tab_show"></div>
+        </div>
+    </div>
+    <div class="page-content-bg"></div>
+    <style id="theme_style"></style>
+    <!-- 右侧主体结束 -->
+    <!-- 中部结束 -->
+</body>
+<script>
+    layui.use(['layer','form','element','jquery'],function () {
+        var layer = layui.layer;
+        var element = layui.element;
+        var $ = layui.jquery;
+        $('#logout').click(function () {
+            $.cookie('token',null);
+            layer.msg('正在退出登录')
+            setTimeout(function () {
+                location.href="/login";
+            },1000)
+        });
+        $('#initdatabase').click(function () {
+                layer.open({
+                    type:2,
+                    title: '任务消息',
+                    shadeClose: true,
+                    shade: 0.6,
+                    maxmin:true,
+                    anim:2,
+                    area: ['400px', '300px'],
+                    content: './task_msg?action=initdatabase' //iframe的url
+                });
+            });
+        $('#checkfile').click(function () {
+                layer.open({
+                    type:2,
+                    title: '任务消息',
+                    shadeClose: true,
+                    shade: 0.6,
+                    maxmin:true,
+                    anim:2,
+                    area: ['400px', '300px'],
+                    content: './task_msg?action=checkfile' //iframe的url
+                });
+            });
+    });
+</script>
+</html>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html class="x-admin-sm">
+
+<head>
+    <meta charset="UTF-8">
+    <title>LinuxSecurity管理系统</title>
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="stylesheet" href="/static/css/font.css">
+    <!-- <link rel="stylesheet" href="./css/font.css"> -->
+
+    <link rel="stylesheet" href="/static/css/xadmin.css">
+    <link rel="stylesheet" href="/static/css/theme2.css">
+    <script src="/static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <script src="/static/js/jquery.min.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    <script>
+    </script>
+    <style>
+        #task_msg_box {
+            font-size: large;
+            color: #b2b2b2;
+        }
+
+        #task_msg_box .time {
+            display: inline-block;
+            text-indent: 1em;
+        }
+
+        #task_msg_box .msg {
+            display: inline-block;
+            text-indent: 1em;
+        }
+    </style>
+</head>
+
+<body class="content" style="background-color: #0C0C0C;">
+<div id="task_msg_box">
+    <span></span>
+    <p></p>
+</div>
+</body>
+<script>
+    layui.use(['layer', 'element', 'jquery'], function () {
+        layer = layui.layer;
+        element = layui.element;
+        $ = layui.jquery;
+        var isOver = false;
+
+        function scrollToEnd() {//滚动到底部
+            var h = $(document).height() - $(window).height();
+            $(document).scrollTop(h);
+        }
+
+        function taskmsg() {
+            if (isOver) {
+                return;
+            }
+            $.ajax({
+                url: '/task_msg',
+                type: 'POST',
+                success: function (result) {
+                    if (result.code === 200) {
+                        {#$("#task_msg_box").empty();#}
+                        for (i = 0; i < result.data.length; i++) {
+                            data = result.data[i];
+                            $span = $('<span class="time">' + data.time + ' ' + ':</span>');
+                            $p = $('<p class="msg">' + ' ' + data.msg + '</p><br><br>');
+                            $("#task_msg_box").append($span);
+                            $("#task_msg_box").append($p);
+                        }
+                        if (result.data[result.data.length - 1].time === 'over') {
+                            isOver = true;
+                            {#$("#task_msg_box").empty();#}
+                            console.log('完成');
+                        }
+                    }
+                }
+            });
+            setTimeout(taskmsg, 1000);
+            scrollToEnd();
+        }
+
+        $(function () {
+            if (!isOver) {
+                taskmsg();
+            }
+        });
+    });
+</script>
+</html>
